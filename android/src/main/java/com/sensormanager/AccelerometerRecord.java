@@ -22,11 +22,8 @@ public class AccelerometerRecord implements SensorEventListener {
 
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
-    private long lastUpdate = 0;
-    private int i = 0, n = 0;
 	private int delay;
 	private int isRegistered = 0;
-
 	private ReactContext mReactContext;
 	private Arguments mArguments;
 
@@ -40,7 +37,7 @@ public class AccelerometerRecord implements SensorEventListener {
 	public int start(int delay) {
 		this.delay = delay;
 		if (mAccelerometer != null && isRegistered == 0) {
-			mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_FASTEST);
+			mSensorManager.registerListener(this, mAccelerometer, delay * 1000);
 			isRegistered = 1;
 			return (1);
 		}
@@ -67,21 +64,15 @@ public class AccelerometerRecord implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        Sensor mySensor = sensorEvent.sensor;
+		Sensor mySensor = sensorEvent.sensor;
 		WritableMap map = mArguments.createMap();
 
-        if (mySensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            long curTime = System.currentTimeMillis();
-            i++;
-            if ((curTime - lastUpdate) > delay) {
-                i = 0;
-				map.putDouble("x", sensorEvent.values[0]);
-				map.putDouble("y", sensorEvent.values[1]);
-				map.putDouble("z", sensorEvent.values[2]);
-				sendEvent("Accelerometer", map);
-                lastUpdate = curTime;
-            }
-        }
+		if (mySensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+			map.putDouble("x", sensorEvent.values[0]);
+			map.putDouble("y", sensorEvent.values[1]);
+			map.putDouble("z", sensorEvent.values[2]);
+			sendEvent("Accelerometer", map);
+		}
     }
 
     @Override
